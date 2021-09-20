@@ -32,10 +32,7 @@ public class CredentialService {
         return encryptedPassword;
     }
 
-    public String decrypt(Credential credential){
-        String decryptedPassword = encryptionService.decryptValue(credential.getPassWord(), credential.getKey());
-        return decryptedPassword;
-    }
+
     public int createCredential(Credential credential, Integer userId){
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
@@ -46,7 +43,8 @@ public class CredentialService {
     }
 
     public int updateCredential(Credential credential){
-        String encryptedPassword = encrypt(credential.getPassWord(),credential.getKey());
+        Credential cred = credentialMapper.getId(credential.getCredentialId());
+        String encryptedPassword = encrypt(credential.getPassWord(),cred.getKey());
         return credentialMapper.update(credential.getCredentialId(), credential.getUrl(), credential.getUserName(), encryptedPassword);
     }
 
