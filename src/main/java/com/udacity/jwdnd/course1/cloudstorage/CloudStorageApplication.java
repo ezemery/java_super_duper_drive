@@ -9,19 +9,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-@EnableConfigurationProperties(StorageProperties.class)
 public class CloudStorageApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CloudStorageApplication.class, args);
-	}
-
-	@Bean
-	CommandLineRunner init(StorageService storageService) {
-		return (args) -> {
-			storageService.deleteAll();
-			storageService.init();
-		};
 	}
 
 }

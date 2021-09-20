@@ -10,17 +10,20 @@ public interface CredentialMapper {
     @Select("select * from credentials where userId = #{userId}")
     List<Credential> getAll(Integer userId);
 
-    @Select("select * from credentials where userName = #{userName}")
-    Credential get(String userName);
+    @Select("select * from credentials where url = #{url}")
+    Credential getUrl(String url);
+
+    @Select("select * from credentials where credentialId = #{id}")
+    Credential getId(Integer id);
 
     @Insert("insert into credentials (userName, url, key,passWord, userId) values (#{userName},#{url},#{key},#{passWord},#{userId})")
-    @Options(useGeneratedKeys = true, keyProperty = "userId")
+    @Options(useGeneratedKeys = true,keyColumn = "credentialId", keyProperty = "credentialId")
     int insert(Credential credential);
 
-    @Update("update credentials set url = #{url}, key = #{key}, passWord = #{passWord} where userName = #{userName}")
-    @Options(useGeneratedKeys = true, keyProperty = "userId")
-    int update(String url, String key, String passWord, Integer userId);
+    @Update("update credentials set url = #{url}, userName = #{userName}, passWord = #{passWord} where credentialId = #{credentialId}")
+    @Options(useGeneratedKeys = true,keyColumn = "credentialId")
+    int update(Integer credentialId, String url,String userName, String passWord);
 
-    @Delete("delete from credentials where userName = #{userName}")
-    void delete(String userName);
+    @Delete("delete from credentials where credentialId = #{id}")
+    void delete(Integer id);
 }

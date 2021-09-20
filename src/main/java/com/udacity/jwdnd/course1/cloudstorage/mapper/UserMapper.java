@@ -14,11 +14,10 @@ public interface UserMapper {
     User get(String userName);
 
     @Insert("insert into users (userName,salt, passWord,firstName, lastName) values (#{userName},#{salt},#{passWord},#{firstName},#{lastName})")
-    @Options(useGeneratedKeys = true, keyProperty = "userId")
+    @Options(useGeneratedKeys = true, keyColumn = "userId", keyProperty = "userId")
     int insert(User user);
 
     @Update("update users set userName = #{userName}, passWord = #{passWord} where userId = #{userId}")
-    @Options(useGeneratedKeys = true, keyProperty = "userId")
     int update(String username, String password, Integer userId);
 
     @Delete("delete from users where userId = #{userId}")

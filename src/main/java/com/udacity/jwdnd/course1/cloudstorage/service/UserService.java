@@ -35,10 +35,9 @@ public class UserService {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
         random.nextBytes(salt);
-        int int_random = random.nextInt(Integer.MAX_VALUE);
         String encodedSalt = Base64.getEncoder().encodeToString(salt);
         String encryptedPassword = encryptionService.encryptValue(user.getPassWord(), encodedSalt);
-        return userMapper.insert(new User(int_random, user.getUserName(), encodedSalt, encryptedPassword, user.getFirstName(), user.getLastName()));
+        return userMapper.insert(new User(null, user.getUserName(), encodedSalt, encryptedPassword, user.getFirstName(), user.getLastName()));
     }
 
     public void deleteUser(int userId){

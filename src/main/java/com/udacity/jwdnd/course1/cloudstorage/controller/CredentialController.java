@@ -8,9 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/credential")
@@ -24,11 +23,47 @@ public class CredentialController {
         this.userService = userService;
     }
 
+    @GetMapping("/delete/{id}")
+    public String deleteFile(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes){
+
+        try{
+            credentialService.deleteCredential(id);
+            redirectAttributes.addAttribute("success", true);
+        }catch(Exception e) {
+            redirectAttributes.addAttribute("error", e);
+        }
+        return "redirect:/home";
+    }
+
+    @PostMapping("/edit")
+    public String editCredential(@ModelAttribute Credential credential, RedirectAttributes redirectAttributes){
+        String editCredentialError = null;
+
+        if(editCredentialError == null){
+            int rowsAdded = credentialService.updateCredential(credential);
+            if(rowsAdded < 0){
+                editCredentialError = "Something went wrong in editing the credential";
+            }
+        }
+
+        if(editCredentialError == null){
+            redirectAttributes.addAttribute("success", true);
+        }else{
+            redirectAttributes.addAttribute("error", editCredentialError);
+        }
+
+        return "redirect:/home";
+    }
+
     @PostMapping()
-    public String postACredential(Authentication authentication, @ModelAttribute Credential credential, Model model){
+    public String postACredential(Authentication authentication, @ModelAttribute Credential credential, RedirectAttributes redirectAttributes){
         String createCredentialError = null;
         String username = authentication.getName();
         User user = userService.getUser(username);
+
+        if(!credentialService.isUrlAvailable(credential.getUrl())){
+            createCredentialError = "The url already exists.";
+        }
 
         if(createCredentialError == null){
             int rowsAdded = credentialService.createCredential(credential, user.getUserId());
@@ -38,11 +73,11 @@ public class CredentialController {
         }
 
         if(createCredentialError == null){
-            model.addAttribute("success", true);
+            redirectAttributes.addAttribute("success", true);
         }else{
-            model.addAttribute("error", createCredentialError);
+            redirectAttributes.addAttribute("error", createCredentialError);
         }
 
-        return "result";
+        return "redirect:/home";
     }
 }

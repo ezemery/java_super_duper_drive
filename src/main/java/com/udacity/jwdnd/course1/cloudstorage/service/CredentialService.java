@@ -23,25 +23,38 @@ public class CredentialService {
         return credentialMapper.getAll(userId );
     }
 
-    public Credential getCredential(String userName){
-        return credentialMapper.get(userName);
+    public Credential getCredential(Integer id){
+        return credentialMapper.getId(id);
     }
 
+    public String encrypt(String password, String salt){
+        String encryptedPassword = encryptionService.encryptValue(password, salt);
+        return encryptedPassword;
+    }
+
+    public String decrypt(Credential credential){
+        String decryptedPassword = encryptionService.decryptValue(credential.getPassWord(), credential.getKey());
+        return decryptedPassword;
+    }
     public int createCredential(Credential credential, Integer userId){
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
         random.nextBytes(salt);
-        int int_random = random.nextInt(Integer.MAX_VALUE);
         String encodedSalt = Base64.getEncoder().encodeToString(salt);
-        String encryptedPassword = encryptionService.encryptValue(credential.getPassWord(), encodedSalt);
-        return credentialMapper.insert(new Credential(int_random, credential.getUrl(),  credential.getUserName(),encodedSalt, encryptedPassword, userId));
+        String encryptedPassword = encrypt(credential.getPassWord(),encodedSalt);
+        return credentialMapper.insert(new Credential(null, credential.getUrl(),  credential.getUserName(),encodedSalt, encryptedPassword, userId));
     }
 
     public int updateCredential(Credential credential){
-        return credentialMapper.update(credential.getUrl(), credential.getKey(), credential.getPassWord(), 1);
+        String encryptedPassword = encrypt(credential.getPassWord(),credential.getKey());
+        return credentialMapper.update(credential.getCredentialId(), credential.getUrl(), credential.getUserName(), encryptedPassword);
     }
 
-    public void deleteCredential(Credential credential){
-         credentialMapper.delete(credential.getUserName());
+    public boolean isUrlAvailable(String url) {
+        return credentialMapper.getUrl(url) == null;
+    }
+
+    public void deleteCredential(Integer credentialId){
+         credentialMapper.delete(credentialId);
     }
 }
