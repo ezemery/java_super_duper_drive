@@ -52,7 +52,7 @@ public class HomeController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(file.getContentType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION,
-                "inline; filename=\"" + file.getFileName() + "\"")
+                "attachment; filename=\"" + file.getFileName() + "\"")
                 .body(file.getFileData());
     }
 

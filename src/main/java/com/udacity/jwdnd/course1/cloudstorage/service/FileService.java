@@ -4,6 +4,7 @@ import com.udacity.jwdnd.course1.cloudstorage.mapper.FileMapper;
 import com.udacity.jwdnd.course1.cloudstorage.model.File;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
@@ -25,15 +26,15 @@ public class FileService {
     }
 
     public int createFile(MultipartFile file, Integer userId) throws Exception {
-        try {
+        System.out.println("Size " + file.getSize() );
             if (file.isEmpty()) {
                 throw new Exception("Failed to store empty file.");
             }
+            if(file.getSize() > 1000000) {
+                throw new MaxUploadSizeExceededException(file.getSize());
+            }
+
             return fileMapper.insert(new File(null, file.getOriginalFilename(), file.getContentType(), file.getSize(),userId,file.getBytes()));
-        }
-        catch (Exception e) {
-            throw new Exception("Failed to store file.", e);
-        }
 
     }
 

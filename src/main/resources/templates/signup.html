@@ -20,8 +20,8 @@
                 <div th:if="${signupSuccess}" class="alert alert-dark" id="success-msg">
                     You successfully signed up! Please continue to the <a id="login-link"  th:href="@{/login}">login</a> page.
                 </div>
-                <div th:if="${signupError}" class="alert alert-danger" id="error-msg">
-                    <span th:text="${signupError}">Example Signup Error Message</span>
+                <div th:if="${param.signupError}" class="alert alert-danger" id="error-msg">
+                    <span th:text="${param.signupError}">Example Signup Error Message</span>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">

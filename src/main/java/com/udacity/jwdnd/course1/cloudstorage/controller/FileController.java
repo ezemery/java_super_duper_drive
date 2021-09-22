@@ -29,7 +29,7 @@ public class FileController {
 
         try{
             fileService.delete(id);
-            redirectAttributes.addAttribute("success", true);
+            redirectAttributes.addAttribute("success", "File was successfully deleted");
         }catch(Exception e) {
             redirectAttributes.addAttribute("error", e);
         }
@@ -50,12 +50,12 @@ public class FileController {
             try{
                 int rowsAdded = fileService.createFile(file, user.getUserId());
             }catch (Exception e){
-                createFileError = "Something went wrong in creating the file " + file.getOriginalFilename();
+                createFileError = "Something went wrong in creating the file. " + e ;
             }
         }
 
         if(createFileError == null){
-            redirectAttributes.addAttribute("success", true);
+            redirectAttributes.addAttribute("success", "File was successfully uploaded");
         }else{
             redirectAttributes.addAttribute("error", createFileError);
         }

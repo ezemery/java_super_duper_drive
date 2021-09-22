@@ -28,7 +28,7 @@ public class CredentialController {
 
         try{
             credentialService.deleteCredential(id);
-            redirectAttributes.addAttribute("success", true);
+            redirectAttributes.addAttribute("success", "Credential was successfully deleted");
         }catch(Exception e) {
             redirectAttributes.addAttribute("error", e);
         }
@@ -47,7 +47,7 @@ public class CredentialController {
         }
 
         if(editCredentialError == null){
-            redirectAttributes.addAttribute("success", true);
+            redirectAttributes.addAttribute("success", "Credential was successfully edited");
         }else{
             redirectAttributes.addAttribute("error", editCredentialError);
         }
@@ -73,7 +73,7 @@ public class CredentialController {
         }
 
         if(createCredentialError == null){
-            redirectAttributes.addAttribute("success", true);
+            redirectAttributes.addAttribute("success", "Credential was successfully created");
         }else{
             redirectAttributes.addAttribute("error", createCredentialError);
         }

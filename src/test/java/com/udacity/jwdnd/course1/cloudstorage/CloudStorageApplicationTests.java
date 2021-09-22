@@ -10,12 +10,12 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CloudStorageApplicationTests {
 
 	@LocalServerPort
@@ -37,8 +37,6 @@ class CloudStorageApplicationTests {
 		loginPage = new LoginPage(driver);
 		signupPage = new SignupPage(driver);
 		homePage = new HomePage(driver);
-		driver.get("http://localhost:" + port + "/signup");
-		signupPage.registerUser("Ezechukwu","Emmanuel","eze09","ezemery");
 	}
 
 	@AfterEach
@@ -49,12 +47,17 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
-	void testUnauthorizedAccessRestrictions() {
-		WebDriverWait wait = new WebDriverWait(driver, 10);
-		driver.get("http://localhost:" + port + "/home");
-		Boolean loginUrl = wait.until(ExpectedConditions.urlContains("/login"));
-		assertEquals(loginUrl, true);
+	@Order(1)
+	void TestSuccessfulSignUp(){
+		driver.get("http://localhost:" + port + "/signup");
+		signupPage.registerUser("Ezechukwu","Emmanuel","eze09","ezemery");
+	}
 
+	@Test
+	@Order(2)
+	void TestSuccessfulLogin(){
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		driver.get("http://localhost:" + port + "/login");
 		loginPage.loginUser("eze09","ezemery");
 		WebElement noteTab = wait.until(ExpectedConditions.elementToBeClickable(homePage.NavNoteTab));
 		WebElement fileTab = wait.until(ExpectedConditions.elementToBeClickable(homePage.NavFileTab));
@@ -62,18 +65,25 @@ class CloudStorageApplicationTests {
 		assertEquals("Notes", noteTab.getText());
 		assertEquals("Files", fileTab.getText());
 		assertEquals("Credentials", credentialTab.getText());
-
-		homePage.LogoutButton.submit();
-		assertEquals(loginUrl, true);
-
 	}
 
 	@Test
-	void testCreateEditDeleteNote(){
+	@Order(3)
+	void TestUnauthorizedAccessRestrictions() {
 		WebDriverWait wait = new WebDriverWait(driver, 10);
-		driver.get("http://localhost:" + port + "/login");
-		loginPage.loginUser("eze09","ezemery");
+		driver.get("http://localhost:" + port + "/home");
+		Boolean loginUrl = wait.until(ExpectedConditions.urlContains("/login"));
+		assertEquals(loginUrl, true);
+		TestSuccessfulLogin();
+		homePage.LogoutButton.submit();
+		assertEquals(loginUrl, true);
+	}
 
+	@Test
+	@Order(4)
+	void TestCreateNote(){
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		TestSuccessfulLogin();
 		WebElement noteTab = wait.until(ExpectedConditions.elementToBeClickable(homePage.NavNoteTab));
 		noteTab.click();
 		WebElement newNoteButton = wait.until(ExpectedConditions.elementToBeClickable(homePage.NewNoteButton));
@@ -83,12 +93,19 @@ class CloudStorageApplicationTests {
 		homePage.NoteDescription.sendKeys("Stop Crying");
 		homePage.NoteSubmit.submit();
 		Boolean createNoteSuccess = wait.until(ExpectedConditions.urlContains("success"));
-
 		noteTab.click();
 		List<WebElement> noteList = homePage.DisplayNoteTitle;
 		assertEquals(1, noteList.size());
 		assertEquals(createNoteSuccess, true);
+	}
 
+	@Test
+	@Order(5)
+	void TestEditNote(){
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		TestSuccessfulLogin();
+		WebElement noteTab = wait.until(ExpectedConditions.elementToBeClickable(homePage.NavNoteTab));
+		noteTab.click();
 		WebElement noteEditButton = wait.until(ExpectedConditions.elementToBeClickable(homePage.EditNoteButton));
 		noteEditButton.click();
 		WebElement noteEditTabModal = wait.until(ExpectedConditions.visibilityOf(homePage.EditNoteModal));
@@ -99,23 +116,29 @@ class CloudStorageApplicationTests {
 		homePage.EditNoteSubmit.submit();
 		Boolean editNoteSuccess = wait.until(ExpectedConditions.urlContains("success"));
 		assertEquals(editNoteSuccess, true);
+	}
 
+	@Test
+	@Order(6)
+	void TestDeleteNote(){
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		TestSuccessfulLogin();
+		WebElement noteTab = wait.until(ExpectedConditions.elementToBeClickable(homePage.NavNoteTab));
 		noteTab.click();
 		WebElement noteDeleteButton = wait.until(ExpectedConditions.elementToBeClickable(homePage.DeleteNoteButton));
 		noteDeleteButton.click();
 		Boolean deleteNoteSuccess = wait.until(ExpectedConditions.urlContains("success"));
 		noteTab.click();
+		List<WebElement> noteList = homePage.DisplayNoteTitle;
 		assertEquals(deleteNoteSuccess, true);
 		assertEquals(0, noteList.size());
-
 	}
 
 	@Test
-	void testCreateEditDeleteCredential(){
+	@Order(7)
+	void TestCreateCredential(){
 		WebDriverWait wait = new WebDriverWait(driver, 10);
-		driver.get("http://localhost:" + port + "/login");
-		loginPage.loginUser("eze09","ezemery");
-
+		TestSuccessfulLogin();
 		WebElement credentialTab = wait.until(ExpectedConditions.elementToBeClickable(homePage.NavCredentialsTab));
 		credentialTab.click();
 		WebElement newCredentialButton = wait.until(ExpectedConditions.elementToBeClickable(homePage.NewCredentialButton));
@@ -126,12 +149,20 @@ class CloudStorageApplicationTests {
 		homePage.CredentialPassword.sendKeys("123456789");
 		homePage.CredentialSubmit.submit();
 		Boolean createCredentialSuccess = wait.until(ExpectedConditions.urlContains("success"));
-
 		credentialTab.click();
 		List<WebElement> credentialList = homePage.DisplayCredentialUrl;
 		assertEquals(1, credentialList.size());
 		assertEquals(createCredentialSuccess, true);
 
+	}
+
+	@Test
+	@Order(8)
+	void TestEditCredential(){
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		TestSuccessfulLogin();
+		WebElement credentialTab = wait.until(ExpectedConditions.elementToBeClickable(homePage.NavCredentialsTab));
+		credentialTab.click();
 		WebElement credentialEditButton = wait.until(ExpectedConditions.elementToBeClickable(homePage.EditCredentialButton));
 		credentialEditButton.click();
 		WebElement credentialEditTabModal = wait.until(ExpectedConditions.visibilityOf(homePage.EditCredentialModal));
@@ -142,15 +173,22 @@ class CloudStorageApplicationTests {
 		homePage.CredentialEditPassword.clear();
 		homePage.CredentialEditPassword.sendKeys("987654321");
 		homePage.CredentialEditSubmit.submit();
-
 		Boolean editCredentialSuccess = wait.until(ExpectedConditions.urlContains("success"));
 		assertEquals(editCredentialSuccess, true);
+	}
 
+	@Test
+	@Order(9)
+	void TestDeleteCredential(){
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		TestSuccessfulLogin();
+		WebElement credentialTab = wait.until(ExpectedConditions.elementToBeClickable(homePage.NavCredentialsTab));
 		credentialTab.click();
 		WebElement credentialDeleteButton = wait.until(ExpectedConditions.elementToBeClickable(homePage.DeleteCredentialButton));
 		credentialDeleteButton.click();
 		Boolean deleteCredentialSuccess = wait.until(ExpectedConditions.urlContains("success"));
 		credentialTab.click();
+		List<WebElement> credentialList = homePage.DisplayCredentialUrl;
 		assertEquals(deleteCredentialSuccess, true);
 		assertEquals(0, credentialList.size());
 

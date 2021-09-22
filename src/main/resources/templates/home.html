@@ -17,6 +17,10 @@
             </div>
             <div id="contentDiv" style="clear: right;">
                 <div class="container justify-content-center p-3">
+                    <div  th:if="${param.success}" class="alert alert-success fill-parent">
+                        <h1 class="display-5">Success</h1>
+                        <span th:text="${param.success}">Example Success Message</span>
+                    </div>
                     <div th:if="${param.error}" class="alert alert-danger">
                         <h1 class="display-5">Error</h1>
                         <span th:text="${param.error}">Example Error Message</span>

@@ -27,7 +27,7 @@ public class NoteController {
 
         try{
             noteService.deleteNote(id);
-            redirectAttributes.addAttribute("success", true);
+            redirectAttributes.addAttribute("success", "Note was successfully deleted");
         }catch(Exception e) {
             redirectAttributes.addAttribute("error", e);
         }
@@ -46,7 +46,7 @@ public class NoteController {
         }
 
         if(editNoteError == null){
-            redirectAttributes.addAttribute("success", true);
+            redirectAttributes.addAttribute("success", "Note was successfully edited");
         }else{
             redirectAttributes.addAttribute("error", editNoteError);
         }
@@ -65,14 +65,15 @@ public class NoteController {
         }
 
         if(createNoteError == null){
-            int rowsAdded = noteService.createNote(note, user.getUserId());
-            if(rowsAdded < 0){
+            try {
+                int rowsAdded = noteService.createNote(note, user.getUserId());
+            } catch (Exception e){
                 createNoteError = "Something went wrong in creating the note";
             }
         }
 
         if(createNoteError == null){
-            redirectAttributes.addAttribute("success", true);
+            redirectAttributes.addAttribute("success", "Note was successfully created");
         }else{
             redirectAttributes.addAttribute("error", createNoteError);
         }
